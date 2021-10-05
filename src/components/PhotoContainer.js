@@ -20,9 +20,13 @@ const PhotoContainer = (props) => {
   }
 
   return(
-    <ul>
-      {photos}
-    </ul>
+    <div className="photo-container">
+      <h2> Results for {props.query}</h2>
+      <ul>
+        {photos}
+      </ul>
+    </div>
+    
   )
 }
 
