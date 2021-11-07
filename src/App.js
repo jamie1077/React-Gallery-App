@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import {BrowserRouter, Redirect, Route, Switch} from 'react-router-dom';
 
 //flickr api key
@@ -8,63 +9,63 @@ import apiKey from './config';
 import SearchForm from './components/Search';
 import Nav from './components/Nav';
 import PhotoContainer from './components/PhotoContainer';
-
+import PageNotFound from './components/PageNotFound';
 
 class App extends Component {
 
   constructor() {
     super();
     this.state = {
-      query: '',
       cats: [],
       dogs: [],
       birds: [],
       photos: [],
+      searchQuery: '',
       loading: true
     };
   }
 
   componentDidMount() {
-    const defaultLinks = ["cats", "dogs", "birds"]
-    defaultLinks.map((link) => this.performSearch(link, false))
+    const defaultTags = ["cats", "dogs", "birds"]
+    defaultTags.map((tag) => this.getData(tag, true))
   }
 
-  performSearch = async (query, isNewData) =>{
-    try{
-      const response = await fetch(`https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=${query}&per_page=24&format=json&nojsoncallback=1`);
-      const responseData = await response.json();
-      isNewData
-          ? this.setState({
-              photos: responseData.photos.photo,
-              searchInput: query,
-              loading: false,
-            })
-          : this.setState({
-              [query]: responseData.photos.photo,
-              loading: false,
-            })
-      
-    } catch (error){
-      console.log('Error fetching and parsing data', error);
-    }
+  getData = (query, isNav) =>{
+    axios.get(`https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=${query}&per_page=24&format=json&nojsoncallback=1`)
+    .then(response => {
+      isNav ? 
+        this.setState({
+          [query]: response.data.photos.photo,
+          loading: false
+        })
+      : this.setState({
+          photos: response.data.photos.photo,
+          searchQuery: query,
+          loading: false
+        })
+    })
+    .catch((error) => {
+      console.log('Error fetching and passing data', error)
+    });
   }
 
   render(){
     return (
       <BrowserRouter>
         <div className="container">
-          <SearchForm onSearch={this.performSearch} /> 
+          <SearchForm onSearch={this.getData} /> 
           <Nav />
 
           {
-            (this.state.loading) ? <h3>Loading...</h3> :
+            (this.state.loading) ? <h2>Loading...</h2> :
             (
               <Switch>
                 <Route exact path="/" render={ () => <Redirect to="/cats" />} />
                 <Route path="/cats" render={ () => <PhotoContainer query="cats" data={this.state.cats} /> } />
                 <Route path="/dogs" render={ () => <PhotoContainer query="dogs" data={this.state.dogs} /> } />
                 <Route path="/birds" render={ () => <PhotoContainer query="birds" data={this.state.birds} /> } />
-                <Route path="/search/:query" render={ () => <PhotoContainer query={this.state.query} data={this.state.photos} /> } />
+                <Route path="/:query" render={ () => <PhotoContainer query={this.state.searchQuery} data={this.state.photos} /> } />
+                <Route component={PageNotFound} /> 
               </Switch>
             )
           }
