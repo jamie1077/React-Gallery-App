@@ -30,19 +30,24 @@ class App extends Component {
     defaultTags.map((tag) => this.getData(tag, true))
   }
 
+  // Function to set loading state
+  isLoading = (bool) => {
+    this.setState({ loading: bool })
+  }
+
   getData = (query, isNav) =>{
+    this.isLoading(true);
     axios.get(`https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=${query}&per_page=24&format=json&nojsoncallback=1`)
     .then(response => {
       isNav ? 
         this.setState({
           [query]: response.data.photos.photo,
-          loading: false
         })
       : this.setState({
           photos: response.data.photos.photo,
           searchQuery: query,
-          loading: false
         })
+        this.isLoading(false);
     })
     .catch((error) => {
       console.log('Error fetching and passing data', error)
