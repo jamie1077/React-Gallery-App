@@ -1,13 +1,11 @@
 import React from "react";
-import { Link } from "react-router-dom";
 
 const PageNotFound = () => (
   <div>
     <ul>
       <li className="not-found">
-        <h1>(404): Page Not Found</h1>
-        <h3>Oh no..</h3>
-        <Link to="/cats"></Link>
+        <h1>Uh oh...</h1>
+        <h3>We can't find the page your looking for. Please try again.</h3>
       </li>
   </ul>
   </div>
