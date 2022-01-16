@@ -12,7 +12,6 @@ import PhotoContainer from './components/PhotoContainer';
 import PageNotFound from './components/PageNotFound';
 
 class App extends Component {
-
   constructor() {
     super();
     this.state = {
